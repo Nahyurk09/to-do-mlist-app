@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QA Checklist App</title>
+  <style>
+    :root {
+      --teal: #4bb3a7;
+      --mint: #74ebd5;
+      --sky: #6dd5ed;
+      --indigo: #acb6e5;
+      --card: #ffffff;
+      --text: #333;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(-45deg, var(--mint), var(--indigo), var(--teal), var(--sky));
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      perspective: 1000px;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 2;
+    }
+
+    /* Background scene */
+    .scene {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      transform-style: preserve-3d;
+    }
+
+    .obj {
+      position: absolute;
+      opacity: 0.85;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,0.6));
+      transform-style: preserve-3d;
+      animation: bob 8s ease-in-out infinite, spin 25s linear infinite;
+    }
+
+    .layer-1 { transform: translateZ(-300px) scale(1.4); }
+    .layer-2 { transform: translateZ(-200px) scale(1.5); }
+    .layer-3 { transform: translateZ(-100px) scale(1.6); }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-50px); }
+    }
+
+    @keyframes spin {
+      0%   { transform: rotateX(0deg) rotateY(0deg); }
+      50%  { transform: rotateX(180deg) rotateY(90deg); }
+      100% { transform: rotateX(360deg) rotateY(180deg); }
+    }
+
+    #qa-container {
+      background: var(--card);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      width: 650px;
+      margin-top: 30px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.3s;
+      font-size: 14px;
+    }
+
+    input:focus, textarea:focus { border-color: var(--mint); }
+    textarea { resize: vertical; min-height: 60px; }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 6px;
+      background: var(--mint);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      align-self: flex-start;
+    }
+    button:hover { background: var(--teal); }
+
+    ul { list-style: none; padding: 0; margin-top: 10px; }
+    li {
+      background: #f9f9f9;
+      padding: 14px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background 0.3s;
+    }
+    li:hover { background: #f1f1f1; }
+    li.completed .task-text { text-decoration: line-through; color: gray; }
+
+    .task-header { display: flex; justify-content: space-between; align-items: center; }
+    .task-header-left { display: flex; align-items: center; gap: 10px; }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: #e74c3c;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .delete-btn:hover { color: #c0392b; }
+
+    .deadline { font-size: 13px; color: #555; }
+    .description { font-size: 14px; color: var(--text); }
+    .task-text { color: var(--text); }
+
+    /* SVG colors */
+    .stroke { stroke: #2b7a78; }
+    .fill   { fill: #ff9800; } /* bright orange */
+    .metal  { fill: #b0bec5; } /* metallic gray */
+    .dark   { fill: #2196f3; } /* blue accent */
+  </style>
+</head>
+<body>
+  <header>My To Do List</header>
+
+  <!-- 3D background scene -->
+  <div class="scene" aria-hidden="true">
+    <!-- Pencil -->
+    <svg class="obj layer-1" width="120" height="120" viewBox="0 0 120 120" style="top:10%; left:6%;">
+      <g>
+        <polygon class="fill" points="20,80 90,20 100,30 30,90" />
+        <polygon class="dark" points="90,20 105,15 115,25 100,30" />
+        <polygon class="metal" points="20,80 30,90 25,100 15,90" />
+        <line class="stroke" x1="22" y1="82" x2="97" y2="27" stroke-width="3" />
+      </g>
+    </svg>
+
+    <!-- Wrench -->
+    <svg class="obj layer-2" width="140" height="140" viewBox="0 0 120 120" style="top:35%; left:78%;">
+      <g>
+        <path class="metal" d="M20 90 l30 -30 a20 20 0 1 1 28 -28 l-15 15 l-10 -4 l-18 18 l4 10 l-15 15 z"/>
+        <circle class="dark" cx="22" cy="92" r="6" />
+      </g>
+    </svg>
+
+    <!-- Screw -->
+    <svg class="obj layer-3" width="110" height="110" viewBox="0 0 100 100" style="top:62%; left:18%;">
+      <g>
+        <rect class="metal" x="40" y="20" width="12" height="55" rx="4" />
+        <polygon class="dark" points="40,20 52,20 46,8" />
+        <line class="stroke" x1="40" y1="35" x2="52" y2="35" stroke-width="3" />
+        <line class="stroke" x1="40" y1="45" x2="52" y2="45" stroke-width="3" />
+        <line class="stroke" x1="40" y1="55" x2="52" y2="55" stroke-width="3" />
+      </g>
+    </svg>
+
+    <!-- Toolbox -->
+    <svg class="obj layer-1" width="150" height="100" viewBox="0 0 130 90" style="top:78%; left:68%;">
+      <g>
+        <rect class="fill" x="20" y="35" width="90" height="40" rx="8"/>
+        <rect class="dark" x="30" y="25" width="70" height="18" rx="6"/>
+        <rect class="metal" x="55" y="20" width="20" height="8" rx="3"/>
+      </g>
+    </svg>
+  </div>
+
+  <div id="qa-container">
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter QA task..." />
+      <input type="datetime-local" id="deadlineInput" />
+      <textarea id="descInput" placeholder="Enter description..."></textarea>
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    function addTask(taskText = null, deadline = null, description = null) {
+      const input = document.getElementById("taskInput");
+      const deadlineInput = document.getElementById("deadlineInput");
+      const descInput = document.getElementById("descInput");
+
+      const text = taskText || input.value.trim();
+      const deadlineVal = deadline || deadlineInput.value;
+      const descVal = description || descInput.value.trim();
+
+      if (!text) return;
+
+      const li = document.createElement("li");
+
+      const header = document.createElement("div");
+      header.className = "task-header";
+
+      const headerLeft = document.createElement("div");
+      headerLeft.className = "task-header-left";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.addEventListener("change", () => {
+        li.classList.toggle("completed", checkbox.checked);
+      });
+
+      const span = document.createElement("span");
+      span.textContent = text;
+      span.className = "task-text";
+
+      headerLeft.appendChild(checkbox);
+      headerLeft.appendChild(span);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "✖";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.onclick = () => li.remove();
+
+      header.appendChild(headerLeft);
+      header.appendChild(deleteBtn);
+
+      li.appendChild(header);
+
+      if (deadlineVal) {
+        const deadlineEl = document.createElement("div");
+        deadlineEl.className = "deadline";
+        deadlineEl.textContent = "Deadline: " + new Date(deadlineVal).toLocaleString();
+        li.appendChild(deadlineEl);
+      }
+
+      if (descVal) {
+        const descEl = document.createElement("div");
+        descEl.className = "description";
+        descEl.textContent = "Notes: " + descVal;
+        li.appendChild(descEl);
+      }
+
+      document.getElementById("taskList").appendChild(li);
+
+      input.value = "";
+      deadlineInput.value = "";
+      descInput.value = "";
+    }
+
+
+    window.onload = () => {
+      defaultTasks.forEach(task => addTask(task.text, task.deadline, task.desc));
+    };
+  </script>
+</body>
+</html>
